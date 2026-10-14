@@ -1,0 +1,10 @@
+{
+  "name": "student-feedback",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix server & npm run dev --prefix client",
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "setup": "npm install --prefix server && npm install --prefix client && npm run db:migrate --prefix server && npm run db:seed --prefix server"
+  }
+}

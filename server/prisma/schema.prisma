@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("STUDENT")
+  createdAt    DateTime @default(now())
+
+  taughtCourses Course[]     @relation("CourseFaculty")
+  enrollments   Enrollment[]
+  feedback      Feedback[]
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  description String   @default("")
+  facultyId   String
+  faculty     User     @relation("CourseFaculty", fields: [facultyId], references: [id])
+  createdAt   DateTime @default(now())
+
+  enrollments Enrollment[]
+  feedback    Feedback[]
+}
+
+model Enrollment {
+  id        String   @id @default(uuid())
+  studentId String
+  courseId  String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, courseId])
+}
+
+model Feedback {
+  id              String   @id @default(uuid())
+  studentId       String
+  courseId        String
+  rating          Int
+  teachingQuality Int
+  contentQuality  Int
+  comment         String   @default("")
+  anonymous       Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  student User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+}
